@@ -14,7 +14,7 @@ export const ACTIONS = {
 function reducer (state, action) { 
    switch(action.type){
     case ACTIONS.ADD_DIGIT: 
-      return {...state, currentOperand: `${state.currentOperand || ""}${action.payload.number}`}  
+      return {...state, currentOperand: `${state.currentOperand || ""}${action.payload}`}  
     case ACTIONS.DELETE_DIGIT:
       return state
     case ACTIONS.CLEAR:

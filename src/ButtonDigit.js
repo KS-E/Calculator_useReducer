@@ -6,7 +6,7 @@ export default function ButtonDigit({number,dispatch}) {
   // console.log(number)
   return (
     <>
-      <button onClick={() => dispatch({type:ACTIONS.ADD_DIGIT , payload:{number}})}
+      <button onClick={() => dispatch({type:ACTIONS.ADD_DIGIT , payload:number})}
        >{number}</button>
     </>
   
