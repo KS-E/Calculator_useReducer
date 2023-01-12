@@ -1,9 +1,7 @@
 import React from 'react'
-import ACTIONS from './App'
+import { ACTIONS } from './Actions'
 
 export default function ButtonDigit({number,dispatch}) {
-
-  // console.log(number)
   return (
     <>
       <button onClick={() => dispatch({type:ACTIONS.ADD_DIGIT , payload:number})}

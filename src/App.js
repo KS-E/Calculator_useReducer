@@ -1,61 +1,105 @@
-import React , {useReducer ,useState}from "react";
+import React , {useReducer}from "react";
 import ButtonDigit from "./ButtonDigit";
 import ButtonOperation from "./ButtonOperation";
 import "./style.css"
+import { ACTIONS } from "./Actions";
 
-export const ACTIONS = {
-  ADD_DIGIT : 'add-digit',
-  DELETE_DIGIT: 'delete-digit',
-  CLEAR : 'clear',
-  CHOOSE_OPERATION : 'choose-operation',
-  EVALUATION : 'evaluation'
-}
+var symbol ;
 
 function reducer (state, action) { 
-   switch(action.type){
-    case ACTIONS.ADD_DIGIT: 
+  symbol = ['*','.','+','-','/']
+  console.log(state)
+  console.log(action) 
+  switch(action.type){
+    case ACTIONS.ADD_DIGIT: //add digit
       return {...state, currentOperand: `${state.currentOperand || ""}${action.payload}`}  
-    case ACTIONS.DELETE_DIGIT:
-      return state
-    case ACTIONS.CLEAR:
-      return {currentOperand: 0}
-    case ACTIONS.CHOOSE_OPERATION:
-      return state
-    case ACTIONS.EVALUATION:
-      return state
+    case ACTIONS.DELETE_DIGIT: //single digit
+      return {...state, currentOperand: state.currentOperand.substring(0,state.currentOperand.length-1)}
+    case ACTIONS.CLEAR:  //clear output
+      return { prevOperand: null, currentOperand: 0 ,operation: null}
+    case ACTIONS.CHOOSE_OPERATION: 
+     if(action.payload && state.currentOperand == null) { // operation and evaluation shouldn't be the first button pressed 
+        return state 
+      } else if(state.currentOperand.includes('/') || state.currentOperand.includes('*') ||
+      state.currentOperand.includes('+')|| state.currentOperand.includes('-')) { 
+        //when second operator is pressed operator is in the last entry
+        //when the second operation is pressed, first operator should get replaced by second!!!!!!!!!!!!!!!!!!
+          let string = state.currentOperand
+          let variable = '/^[*+-/]*$/'
+          console.log(string)
+          if(string.charAt([string.length - 1]).match(variable)) {
+            console.log("operator present")
+             return state
+          }
+              const numbers = state.currentOperand.split(/([-+*/])/g) // the number is evaluated
+              const result = evaluateNum(numbers[0], numbers[1],numbers[2])
+              return {currentOperand : result}
+          
+      } else if(action.payload ==='.' && state.currentOperand.includes('.')){ //extra decimals
+        return state
+      } else{ //displaying the operations
+      return {...state, currentOperand: `${state.currentOperand}${action.payload}`}
+     } 
+     //after evaluation func, pressing operation causes error
+    // after getting result , on pressing DEl and any operation button error occurs        
+    case ACTIONS.EVALUATION: //calling evaluation function (when = is pressed)
+        const numbers = state.currentOperand.split(/([-+*/])/g) // the number is evaluated
+        const result = evaluateNum(numbers[0], numbers[1],numbers[2])
+        return {currentOperand : result}
     default:
       return state
    }
 }
+
+// evaluation function
+function evaluateNum( prevOperand, operation, currentOperand){
+   let prevNum = parseFloat(prevOperand)
+   let currentNum = parseFloat(currentOperand)
+   console.log(prevNum)
+   console.log(currentNum)
+   if (operation === '+'){     
+       return prevNum + currentNum
+   } else if(operation === '-') {
+      return  prevNum - currentNum 
+   } else if(operation === '*') {
+      return  prevNum * currentNum
+   } else if(operation === '/' && currentOperand!= '0') {
+      return prevNum / currentNum
+   } 
+}
+
 export default function App() {
   const [{prevOperand=null, currentOperand =0, operation=null}, dispatch] = useReducer(reducer,{})
-  // console.log("Rendered!")
-  // dispatch({payload:})
   return (
     <div className="calculator-grid">
       <div className="output">
         <div className="prev-operand">{prevOperand} {operation}</div>
         <div className="current-operand">{currentOperand}</div>
       </div>
-        <button className="span-two">AC</button>
-        <button>DEL</button>
-        <ButtonOperation operation={'/'} dispatch={dispatch}/>
+        <button className="span-two" onClick={()=> {
+          dispatch({type: ACTIONS.CLEAR , payload:null})
+        }}>AC</button>
+        <button onClick={()=> {
+          dispatch({type: ACTIONS.DELETE_DIGIT , payload:null})
+        }}>DEL</button>
+        <ButtonOperation operation='/' dispatch={dispatch}/>
         <ButtonDigit number="1" dispatch={dispatch}/>
         <ButtonDigit number="2" dispatch={dispatch}/>
         <ButtonDigit number="3" dispatch={dispatch}/>
-        <ButtonOperation operation={'*'} dispatch={dispatch}/>
+        <ButtonOperation operation='*' dispatch={dispatch}/>
         <ButtonDigit number="4" dispatch={dispatch}/>
         <ButtonDigit number="5" dispatch={dispatch}/>
         <ButtonDigit number="6" dispatch={dispatch}/>
-        <ButtonOperation operation={'+'} dispatch={dispatch}/>
+        <ButtonOperation operation='+' dispatch={dispatch}/>
         <ButtonDigit number="7" dispatch={dispatch}/>
         <ButtonDigit number="8" dispatch={dispatch}/>
         <ButtonDigit number="9" dispatch={dispatch}/>
-        <ButtonOperation operation={'-'} dispatch={dispatch}/>
-        <ButtonOperation operation={'.'} dispatch={dispatch}/>
-        <ButtonDigit number="0" dispatch={dispatch}/>
-        <button className="span-two">=</button>
-        {/* <ButtonOperation className="span-two" operation={'='} dispatch={dispatch}/>      */}
+        <ButtonOperation operation='-' dispatch={dispatch}/>
+        <ButtonOperation operation='.' dispatch={dispatch}/>
+        <ButtonDigit number="0" dispatch={dispatch}/>  
+        <button className="span-two" onClick={()=> {
+          dispatch({type: ACTIONS.EVALUATION , payload:'='})
+        }}>=</button>
     </div>
   );
 }
