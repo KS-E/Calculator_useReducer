@@ -4,15 +4,13 @@ import ButtonOperation from "./ButtonOperation";
 import "./style.css"
 import { ACTIONS } from "./Actions";
 
-var symbol ;
 
 function reducer (state, action) { 
-  symbol = ['*','.','+','-','/']
   console.log(state)
   console.log(action) 
   switch(action.type){
     case ACTIONS.ADD_DIGIT: //add digit
-      return {...state, currentOperand: `${state.currentOperand || ""}${action.payload}`}  
+         return {...state, currentOperand: `${state.currentOperand || ""}${action.payload}`}           
     case ACTIONS.DELETE_DIGIT: //single digit
       return {...state, currentOperand: state.currentOperand.substring(0,state.currentOperand.length-1)}
     case ACTIONS.CLEAR:  //clear output
@@ -20,28 +18,12 @@ function reducer (state, action) {
     case ACTIONS.CHOOSE_OPERATION: 
      if(action.payload && state.currentOperand == null) { // operation and evaluation shouldn't be the first button pressed 
         return state 
-      } else if(state.currentOperand.includes('/') || state.currentOperand.includes('*') ||
-      state.currentOperand.includes('+')|| state.currentOperand.includes('-')) { 
-        //when second operator is pressed operator is in the last entry
-        //when the second operation is pressed, first operator should get replaced by second!!!!!!!!!!!!!!!!!!
-          let string = state.currentOperand
-          let variable = '/^[*+-/]*$/'
-          console.log(string)
-          if(string.charAt([string.length - 1]).match(variable)) {
-            console.log("operator present")
-             return state
-          }
-              const numbers = state.currentOperand.split(/([-+*/])/g) // the number is evaluated
-              const result = evaluateNum(numbers[0], numbers[1],numbers[2])
-              return {currentOperand : result}
-          
-      } else if(action.payload ==='.' && state.currentOperand.includes('.')){ //extra decimals
+       }       
+      else if(action.payload ==='.' && state.currentOperand.includes('.')){ //extra decimals
         return state
       } else{ //displaying the operations
       return {...state, currentOperand: `${state.currentOperand}${action.payload}`}
-     } 
-     //after evaluation func, pressing operation causes error
-    // after getting result , on pressing DEl and any operation button error occurs        
+     }      
     case ACTIONS.EVALUATION: //calling evaluation function (when = is pressed)
         const numbers = state.currentOperand.split(/([-+*/])/g) // the number is evaluated
         const result = evaluateNum(numbers[0], numbers[1],numbers[2])
@@ -106,3 +88,24 @@ export default function App() {
 
 //ButtonDigit and ButtonOperation used to display digits and operations
 //respectively in interface
+
+//ERROR TO BE RECTIFIED:
+//1//prevent consecutive operators
+//2// error after operation buttons are pressed after result is assigned to currentOperand 
+
+
+//CHECK CODE: 
+//if(state.currentOperand.includes('/') || state.currentOperand.includes('*') ||
+      //  state.currentOperand.includes('+')|| state.currentOperand.includes('-')) { 
+        //when second operator is pressed operator is in the last entry
+        //when the second operation is pressed, first operator should get replaced by second!!
+          // let string = state.currentOperand
+          // let variable = '/^[*+-/]*$/'
+          // console.log(string)
+          // if(string.charAt([string.length - 1]).match(variable)) {
+            // console.log("operator present")
+            //  return state
+          // }
+          //     const numbers = state.currentOperand.split(/([-+*/])/g) // the number is evaluated
+          //     const result = evaluateNum(numbers[0], numbers[1],numbers[2])
+          //     return {currentOperand : result}
